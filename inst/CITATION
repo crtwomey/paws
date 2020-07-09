@@ -1,0 +1,31 @@
+citHeader("To cite PAWS in publications use:")
+
+citEntry(entry = "Article",
+	title = paste("A machine-vision approach for automated pain",
+		      "measurement at millisecond timescales"),
+	author = personList(
+		as.person("Jessica M. Jones"),
+		as.person("William Foster"),
+		as.person("Colin R. Twomey"),
+		as.person("Justin Burdge"),
+		as.person("Osama Ahmed"),
+		as.person("Talmo D. Pereira"),
+		as.person("Jessica A. Wojick"),
+		as.person("Gregory Corder"),
+		as.person("Joshua B. Plotkin"),
+		as.person("Ishmail Abdus-Saboor")
+	),
+	journal = "bioRxiv",
+	year    = "2020",
+	volume  = "",
+	number	= "",
+	pages   = "",
+	url     = "https://doi.org/10.1101/2020.02.18.955070",
+
+	textVersion = paste(
+		"Jones, J. M., Foster, W., Twomey, C. R., Burdge, J., Ahmed, O.,",
+		"Pereira, T. D., Wojick, J. A., Corder, G., Plotkin, J. B.,",
+		"and Abdus-Saboor, I. (2020) A machine-vision approach for",
+		"automated pain measurement at millisecond timescales."
+	)
+)
