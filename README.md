@@ -50,7 +50,7 @@ scores <- pain_score(paw.features, strains=strains)
 Plotting the kernel density estimates of score distributions by stimulus
 (excluding strain SJL; see the paper) reproduces Fig. 4I of Jones et al.
 
-![Figure 4I](figure4I.svg)
+![Figure 4I](/man/figures/figure4I.svg)
 
 ### Credit
 
