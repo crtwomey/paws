@@ -29,7 +29,7 @@ default_standards <- function() jones2020.standards
 #' Create new strain standards
 #' 
 #' Creates a new reference centering and scaling for the paw features of the
-#' given strain or strains
+#' given strain or strains.
 #' 
 #' @param paw.features list of extracted paw features
 #' @param strain character string or a vector of strain names, each of which

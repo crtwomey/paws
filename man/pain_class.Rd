@@ -15,5 +15,9 @@ pain_class(score, type = c("binary", "trinary"))
 one or more pain classes
 }
 \description{
-Identify pain class based on pain score
+Convenience function to convert pain scores to binary or trinary pain
+classifications, e.g. pain / non-pain or pain / low-pain / high-pain. Note
+that trinary classifications are only valid for pain models fit with trinary
+classes (e.g. Jones et al. 2020). Otherwise the scale of the score is
+arbitrary, and the boundary between low and high pain is not scaled to be 1.
 }

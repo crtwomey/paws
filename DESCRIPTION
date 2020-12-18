@@ -1,6 +1,6 @@
 Package: paws
-Date: 2020-07-08
-Version: 1.0.0
+Date: 2020-12-18
+Version: 1.0.1
 Title: Pain Assessment at Withdrawal Speeds
 Authors@R: c(
     person("Colin", "Twomey", email="crtwomey@gmail.com", role=c("aut","cre")),
@@ -14,8 +14,9 @@ Description: Automated pain scoring from paw withdrawal tracking data. Based on
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.6)
+Depends:
+    R (>= 3.6),
+    brglm2 (>= 0.6)
 Imports:
-    signal (>= 0.7),
-    MASS (>= 7.3)
+    signal (>= 0.7)
 RoxygenNote: 7.0.2

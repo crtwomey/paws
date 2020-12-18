@@ -8,23 +8,32 @@ pain_score(
   paw.features,
   strains = NULL,
   strain.standards = jones2020.standards,
-  feature.set = c("post.peak", "pre.peak")
+  feature.set = c("post.peak", "pre.peak"),
+  pain.model = NULL
 )
 }
 \arguments{
 \item{paw.features}{the paw features returned by
 \code{\link{extract_features}}}
 
-\item{strains}{a vector of containing strain information for each mouse}
+\item{strains}{a vector containing strain information for each mouse}
 
 \item{strain.standards}{z-scores (centering and scaling) information
 by strain}
 
 \item{feature.set}{use either pre-peak or post-peak features}
+
+\item{pain.model}{a pain model returned by \code{\link{create_pain_model}}
+or NULL, in which case the model from Jones et al. 2020 is used.}
 }
 \value{
 one or more pain scores as a vector
 }
 \description{
-Returns a pain score based on Jones et al. 2020
+Returns a pain score based on Jones et al. 2020 or the given pain.model.
+Pain scores are standardized so that increasingly positive (negative) values
+correspond to increasingly likely to be painful (unlikely to be painful)
+experiences. Pain scores based on pain models derived from trinary pain
+stimuli will additionally be scaled such that the transition between low
+and high pain is occurs at 1. Scores are not comparable across pain models.
 }

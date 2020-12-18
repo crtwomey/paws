@@ -18,5 +18,5 @@ list of pre-peak and post-peak strain standards, indexed by strain
 }
 \description{
 Creates a new reference centering and scaling for the paw features of the
-given strain or strains
+given strain or strains.
 }
