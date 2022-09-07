@@ -46,12 +46,18 @@
 #'        filtering, windowing, and thresholds, for paw features
 #'        (see \code{\link{default_parameters}}, or use
 #'        \code{\link{set_parameters}} to modify the defaults).
+#' @param diagnostics set to TRUE will record intermediate values
+#'        used when computing paw features. This information can
+#'        be helpful for debugging parameter choices. The default,
+#'        FALSE, is to not record these values.
 #' 
-#' @return pre-peak and post-peak paw features
+#' @return pre-peak and post-peak paw features (plus diagnostics,
+#'         if enabled)
 #' 
 #' @export
 extract_features <- function(x, y=NULL,
-	parameters = default_parameters())
+	parameters  = default_parameters(),
+	diagnostics = FALSE)
 {
 	# check that time series data is provided as either
 	# 1. x : vector, y : vector, length(x) == length(y)
@@ -191,9 +197,115 @@ extract_features <- function(x, y=NULL,
 		),
 		parameters = parameters
 	)
+	if (diagnostics) {
+		features <- c(features, list(
+				diagnostics    = list(
+					x            = x,
+					y            = y,
+					x.window     = x.window,
+					y.window     = y.window,
+					window       = window,
+					x.clipped    = x.clipped,
+					y.clipped    = y.clipped,
+					u.projection = u,
+					global.peak  = global.peak,
+					local.peaks  = local.peaks,
+					first.peak   = first.peak,
+					x.velocity   = gvx,
+					y.velocity   = gvy
+				)
+		))
+	}
 	attr(features, 'class') <- 'paw.features'
 	return(features)
 
 	}) # with parameters
 }
+
+plot_diagnostics <- function(features) {
+	if (!exists("diagnostics", features)) {
+		stop(paste0(
+			"No diagnostics available. Diagnostic values need to be generated ",
+			"by passing diagnostics = TRUE to the call to extract_features."
+		))
+	}
+
+	with(features$diagnostics, {
+		s <- window$start
+		decorate <- function() {
+			abline(h = 0, col = "gray60")
+			abline(v = c(window$start, window$end), lty = 2, col = 4)
+			abline(v = s + first.peak$time, lty = 1, col = 2)
+		}
+
+		op <- par(mar = c(5, 5, 1, 1), mfrow = c(3, 2))
+		plot(x, type = "l", las = 1, xaxs = "i",
+			xlab = "time (frames)"
+		)
+		decorate()
+		plot(s + seq_along(x.velocity), x.velocity,
+			type = "l", las = 1, xaxs = "i",
+			xlim = c(1, length(x)),
+			xlab = "time (frames)",
+			ylab = "x velocity"
+		)
+		decorate()
+
+		plot(y, type = "l", las = 1, xaxs = "i",
+			xlab = "time (frames)"
+		)
+		points(s + global.peak$time, y[s + global.peak$time],
+			col = 4, pch = 16, cex = 1.25
+		)
+		points(s + local.peaks, y[s + local.peaks], cex = 1.25)
+		decorate()
+		plot(s + seq_along(y.velocity), y.velocity,
+			type = "l", las = 1, xaxs = "i",
+			xlim = c(1, length(x)),
+			xlab = "time (frames)",
+			ylab = "y velocity"
+		)
+		decorate()
+
+		plot(s + seq_along(u.projection), u.projection,
+			type = "l", las = 1, xaxs = "i",
+			xlim = c(1, length(x)),
+			xlab = "time (frames)",
+			ylab = "univariate projection"
+		)
+		decorate()
+		par(op)
+	})
+}
+
+#' @method plot paw.features
+#' @export
+plot.paw.features <- function(features) {
+	if (exists("diagnostics", features)) {
+		plot_diagnostics(features)
+	} else {
+		with(features$time.series, {
+			decorate <- function() {
+				abline(h = 0, col = "gray60")
+				abline(v = tstar, lty = 1, col = 2, lwd = 2)
+			}
+			op <- par(mar = c(5, 5, 1, 1), mfrow = c(3, 1))
+			plot(x, type = "l", las = 1, xaxs = "i",
+				xlab = "time (frames)"
+			)
+			decorate()
+			plot(y, type = "l", las = 1, xaxs = "i",
+				xlab = "time (frames)"
+			)
+			decorate()
+			plot(u, type = "l", las = 1, xaxs = "i",
+				xlab = "time (frames)",
+			ylab = "univariate projection"
+			)
+			decorate()
+			par(op)
+		})
+	}
+}
+
 

@@ -19,4 +19,4 @@ Depends:
     brglm2 (>= 0.6)
 Imports:
     signal (>= 0.7)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.2.0

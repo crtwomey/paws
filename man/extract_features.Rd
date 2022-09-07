@@ -4,7 +4,12 @@
 \alias{extract_features}
 \title{Extract features for paw time series}
 \usage{
-extract_features(x, y = NULL, parameters = default_parameters())
+extract_features(
+  x,
+  y = NULL,
+  parameters = default_parameters(),
+  diagnostics = FALSE
+)
 }
 \arguments{
 \item{x}{time series of horizontal paw movement. Alternatively,
@@ -17,9 +22,15 @@ a two column matrix.}
 filtering, windowing, and thresholds, for paw features
 (see \code{\link{default_parameters}}, or use
 \code{\link{set_parameters}} to modify the defaults).}
+
+\item{diagnostics}{set to TRUE will record intermediate values
+used when computing paw features. This information can
+be helpful for debugging parameter choices. The default,
+FALSE, is to not record these values.}
 }
 \value{
-pre-peak and post-peak paw features
+pre-peak and post-peak paw features (plus diagnostics,
+        if enabled)
 }
 \description{
 Extract features for paw time series
