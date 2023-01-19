@@ -163,32 +163,32 @@ get_shakes_post_peak <- function(u,
 	# compute smoothed first derivative
 	v <- signal::sgolayfilt(u, p=filter.order, n=filter.size, m=1)
 
-  # identify frames where local minima and maxima occur (zero crossings in
-  # the first derivative of the univariate projection time series)
+	# identify frames where local minima and maxima occur (zero crossings in
+	# the first derivative of the univariate projection time series)
 	delta <- diff(sign(v))
 	zero.crossing <- which(delta != 0)
 
-  # rescale time series by the maximum height attained. The shake threshold
-  # parameter is expressed in terms of this rescaled displacement
+	# rescale time series by the maximum height attained. The shake threshold
+	# parameter is expressed in terms of this rescaled displacement
 	s <- u / global.peak.height
 
-  # include time of the first peak in the set of zero crossings. Used for
-  # measuring the displacement between successive critical points
+	# include time of the first peak in the set of zero crossings. Used for
+	# measuring the displacement between successive critical points
 	zero.crossing <- sort(c(zero.crossing, first.peak.time))
 
-  # find zero crossings that exceed the shake threshold, i.e. local minima and
-  # maxima where displacement from the previous minimum or maximum (or the
-  # first peak) exceeds the shake threshold. The first entry in zero.crossing
-  # has no predecessor, so it can never cross the displacement threshold
+	# find zero crossings that exceed the shake threshold, i.e. local minima and
+	# maxima where displacement from the previous minimum or maximum (or the
+	# first peak) exceeds the shake threshold. The first entry in zero.crossing
+	# has no predecessor, so it can never cross the displacement threshold
 	past.threshold  <- abs(diff(s[zero.crossing])) > threshold
 	past.threshold  <- c(FALSE, past.threshold)
 	
-  # only retain information about zero crossings after (and excluding) the
-  # first peak time
+	# only retain information about zero crossings after (and excluding) the
+	# first peak time
 	threshold.past.peak <- past.threshold[zero.crossing > first.peak.time]
 
-  # if there are no zero crossings after the first peak, then there are
-  # no shakes to report
+	# if there are no zero crossings after the first peak, then there are
+	# no shakes to report
 	if (length(threshold.past.peak) == 0) {
 		return(list(
 			total.length     = 0,
@@ -198,34 +198,34 @@ get_shakes_post_peak <- function(u,
 		))
 	}
 
-  # identify shaking sequences by consecutive zero crossings that exceed the
-  # displacement threshold parameter. A shaking sequence is terminated by a
-  # crossing that fails to exceed this threshold. break.points bookend these
-  # sequences, starting at 0 (before the first zero crossing after the first
-  # peak) and ending with the final break point after the last zero crossing
+	# identify shaking sequences by consecutive zero crossings that exceed the
+	# displacement threshold parameter. A shaking sequence is terminated by a
+	# crossing that fails to exceed this threshold. break.points bookend these
+	# sequences, starting at 0 (before the first zero crossing after the first
+	# peak) and ending with the final break point after the last zero crossing
 	break.points <- which(abs(diff(threshold.past.peak))==1)
 	break.points <- c(0, break.points)
 	if (tail(break.points,1) != length(threshold.past.peak)) {
 		break.points <- c(break.points, length(threshold.past.peak))
 	}
 
-  # a shaking sequence requires at least 2 zero crossings. A non-shaking
-  # sequence has fewer than two crossings or no displacements above threshold.
-  # For each sequence (bookended by consecutive break.points), shaking.sequence
-  # codes the sequence as either a shaking sequence (TRUE) or not (FALSE)
+	# a shaking sequence requires at least 2 zero crossings. A non-shaking
+	# sequence has fewer than two crossings or no displacements above threshold.
+	# For each sequence (bookended by consecutive break.points), shaking.sequence
+	# codes the sequence as either a shaking sequence (TRUE) or not (FALSE)
 	shaking.sequence <- sapply(2:length(break.points), function(i) {
 		sequence <- (break.points[(i-1)]+1):break.points[i]
 		any(threshold.past.peak[sequence]) && (length(sequence) > 1)
 	})
 	
-  # sequence.lengths counts the number of local minima and maxima contained
-  # within each sequence (computed for both types: shaking and non-shaking)
+	# sequence.lengths counts the number of local minima and maxima contained
+	# within each sequence (computed for both types: shaking and non-shaking)
 	sequence.lengths <- sapply(2:length(break.points), function(i) {
 		sequence <- (break.points[(i-1)]+1):break.points[i]
 		length(sequence)
 	})
 
-  # compute the start and end times of each sequence (both types)
+	# compute the start and end times of each sequence (both types)
 	t0 <- head(which(zero.crossing >= first.peak.time),1)
 	sequence.times <- t(sapply(2:length(break.points), function(i) {
 		t1 <- t0 + break.points[(i-1)]
@@ -233,7 +233,7 @@ get_shakes_post_peak <- function(u,
 		return(c(zero.crossing[t1], zero.crossing[t2]))
 	}))
 	
-  # compute the durations of each sequence (both types)
+	# compute the durations of each sequence (both types)
 	t0 <- head(which(zero.crossing >= first.peak.time),1)
 	sequence.durations <- sapply(2:length(break.points), function(i) {
 		t1 <- t0 + (break.points[(i-1)]+1)
@@ -241,8 +241,8 @@ get_shakes_post_peak <- function(u,
 		zero.crossing[t2] - zero.crossing[t1]
 	})
 
-  # compute the total number of shakes and the total duration of shaking
-  # periods across all shaking sequences
+	# compute the total number of shakes and the total duration of shaking
+	# periods across all shaking sequences
 	tot.length   <- sum(sequence.lengths[shaking.sequence])
 	tot.duration <- sum(sequence.durations[shaking.sequence])
 
