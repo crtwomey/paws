@@ -185,16 +185,21 @@ get_shakes_post_peak <- function(u,
 	
 	# only retain information about zero crossings after (and excluding) the
 	# first peak time
-	threshold.past.peak <- past.threshold[zero.crossing > first.peak.time]
+	crossings.past.peak <- zero.crossing > first.peak.time
+	threshold.past.peak <- past.threshold[crossings.past.peak]
 
 	# if there are no zero crossings after the first peak, then there are
 	# no shakes to report
 	if (length(threshold.past.peak) == 0) {
 		return(list(
-			total.length     = 0,
-			total.duration   = 0,
-			sequence.times   = c(),
-			shaking.sequence = c()
+			total.length      = 0,
+			total.duration    = 0,
+			sequence.times    = c(),
+			sequence.lengths  = c(),
+			shaking.sequence  = c(),
+			zero.crossing     = c(),
+			past.threshold    = c(),
+			scaled.projection = s
 		))
 	}
 
@@ -247,10 +252,14 @@ get_shakes_post_peak <- function(u,
 	tot.duration <- sum(sequence.durations[shaking.sequence])
 
 	return(list(
-		total.length     = tot.length,
-		total.duration   = tot.duration,
-		sequence.times   = sequence.times,
-		shaking.sequence = shaking.sequence
+		total.length      = tot.length,
+		total.duration    = tot.duration,
+		sequence.times    = sequence.times,
+		sequence.lengths  = sequence.lengths,
+		shaking.sequence  = shaking.sequence,
+		zero.crossing     = zero.crossing[crossings.past.peak],
+		past.threshold    = threshold.past.peak,
+		scaled.projection = s
 	))
 }
 

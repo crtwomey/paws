@@ -199,20 +199,21 @@ extract_features <- function(x, y=NULL,
 	)
 	if (diagnostics) {
 		features <- c(features, list(
-				diagnostics    = list(
-					x            = x,
-					y            = y,
-					x.window     = x.window,
-					y.window     = y.window,
-					window       = window,
-					x.clipped    = x.clipped,
-					y.clipped    = y.clipped,
-					u.projection = u,
-					global.peak  = global.peak,
-					local.peaks  = local.peaks,
-					first.peak   = first.peak,
-					x.velocity   = gvx,
-					y.velocity   = gvy
+				diagnostics        = list(
+					x                = x,
+					y                = y,
+					x.window         = x.window,
+					y.window         = y.window,
+					window           = window,
+					x.clipped        = x.clipped,
+					y.clipped        = y.clipped,
+					u.projection     = u,
+					global.peak      = global.peak,
+					local.peaks      = local.peaks,
+					first.peak       = first.peak,
+					x.velocity       = gvx,
+					y.velocity       = gvy,
+					shakes.post.peak = shakes.post.peak
 				)
 		))
 	}
@@ -222,67 +223,141 @@ extract_features <- function(x, y=NULL,
 	}) # with parameters
 }
 
-plot_diagnostics <- function(features) {
+plot_diagnostics <- function(features, clipped = FALSE,
+	panel = c("all",
+		"x displacement", "y displacement", "vx velocity", "vy velocity",
+		"univariate projection", "scaled univariate projection",
+		"kinematics", "displacement", "velocity", "projections"
+	)
+) {
 	if (!exists("diagnostics", features)) {
 		stop(paste0(
 			"No diagnostics available. Diagnostic values need to be generated ",
 			"by passing diagnostics = TRUE to the call to extract_features."
 		))
 	}
+	panel <- match.arg(panel)
 
 	with(features$diagnostics, {
 		s <- window$start
+		w <- if (clipped) {
+			c(window$start, window$end)
+		} else {
+			c(1, length(x))
+		}
 		decorate <- function() {
 			abline(h = 0, col = "gray60")
-			abline(v = c(window$start, window$end), lty = 2, col = 4)
+			if (!clipped) {
+				abline(v = c(window$start, window$end), lty = 2, col = 4)
+			}
 			abline(v = s + first.peak$time, lty = 1, col = 2)
+			axis(3, at = s + first.peak$time, labels = expression(t^"*"),
+				col.axis = "red", tick = FALSE, line = -0.8
+			)
 		}
 
-		op <- par(mar = c(5, 5, 1, 1), mfrow = c(3, 2))
-		plot(x, type = "l", las = 1, xaxs = "i",
-			xlab = "time (frames)"
+		mfrows <- switch(panel,
+			all          = c(3, 2),
+			kinematics   = c(2, 2),
+			displacement = c(1, 2),
+			velocity     = c(1, 2),
+			projections  = c(1, 2),
+			c(1, 1)
 		)
-		decorate()
-		plot(s + seq_along(x.velocity), x.velocity,
-			type = "l", las = 1, xaxs = "i",
-			xlim = c(1, length(x)),
-			xlab = "time (frames)",
-			ylab = "x velocity"
-		)
-		decorate()
+		op <- par(mar = c(5, 5, 4, 1), mfrow = mfrows)
 
-		plot(y, type = "l", las = 1, xaxs = "i",
-			xlab = "time (frames)"
-		)
-		points(s + global.peak$time, y[s + global.peak$time],
-			col = 4, pch = 16, cex = 1.25
-		)
-		points(s + local.peaks, y[s + local.peaks], cex = 1.25)
-		decorate()
-		plot(s + seq_along(y.velocity), y.velocity,
-			type = "l", las = 1, xaxs = "i",
-			xlim = c(1, length(x)),
-			xlab = "time (frames)",
-			ylab = "y velocity"
-		)
-		decorate()
+		if (panel %in% c("all", "kinematics", "displacement", "x displacement")) {
+			plot(x, type = "l", las = 1, xaxs = "i", xlim = w,
+				xlab = "time (frames)",
+				main = "horizontal displacement"
+			)
+			decorate()
+		}
 
-		plot(s + seq_along(u.projection), u.projection,
-			type = "l", las = 1, xaxs = "i",
-			xlim = c(1, length(x)),
-			xlab = "time (frames)",
-			ylab = "univariate projection"
-		)
-		decorate()
+		if (panel %in% c("all", "kinematics", "velocity", "vx velocity")) {
+			plot(s + seq_along(x.velocity), x.velocity,
+				type = "l", las = 1, xaxs = "i", xlim = w,
+				xlab = "time (frames)",
+				ylab = expression(v[x]),
+				main = "estimated horizontal velocity"
+			)
+			decorate()
+		}
+
+		if (panel %in% c("all", "kinematics", "displacement", "y displacement")) {
+			plot(y, type = "l", las = 1, xaxs = "i", xlim = w,
+				xlab = "time (frames)",
+				main = "vertical displacement"
+			)
+			points(s + global.peak$time, y[s + global.peak$time],
+				col = 4, pch = 16, cex = 1.25
+			)
+			points(s + local.peaks, y[s + local.peaks], cex = 1.25)
+			decorate()
+		}
+
+		if (panel %in% c("all", "kinematics", "velocity", "vy velocity")) {
+			plot(s + seq_along(y.velocity), y.velocity,
+				type = "l", las = 1, xaxs = "i", xlim = w,
+				xlab = "time (frames)",
+				ylab = expression(v[y]),
+				main = "estimated vertical velocity"
+			)
+			decorate()
+		}
+
+		if (panel %in% c("all", "projections", "univariate projection")) {
+			plot(s + seq_along(u.projection), u.projection,
+				type = "l", las = 1, xaxs = "i", xlim = w,
+				xlab = "time (frames)",
+				ylab = "u",
+				main = "univariate projection"
+			)
+			decorate()
+		}
+
+		if (panel %in% c("all", "projections", "scaled univariate projection")) {
+			shakes <- shakes.post.peak
+			ymin   <- min(shakes$scaled.projection)
+			ymax   <- max(shakes$scaled.projection)
+			bump   <- (ymax - ymin) * 0.05
+			plot(NA, type = "l", las = 1, xaxs = "i", xlim = w, ylim = c(ymin, ymax),
+				xlab = "time (frames)",
+				ylab = "s",
+				main = "scaled univariate projection"
+			)
+			decorate()
+			for (i in seq_len(nrow(shakes$sequence.times))) {
+				t0 <- s + shakes$sequence.times[i, 1]
+				t1 <- s + shakes$sequence.times[i, 2]
+				ss <- 1 + shakes$shaking.sequence[i]
+				cl <- c("black", "red")
+				rect(
+					xleft = t0, ybottom = ymin - bump, xright = t1, ytop = ymax + bump,
+					col    = adjustcolor(cl, alpha.f = 0.1)[ss],
+					border = "black",
+					lty    = "dotted"
+				)
+				axis(3, at = t0 + (t1 - t0) / 2, tick = FALSE, line = -0.8,
+					labels   = shakes$sequence.lengths[i],
+					col.axis = cl[ss]
+				)
+			}
+			lines(s + seq_along(shakes$scaled.projection), shakes$scaled.projection)
+			points(s + shakes$zero.crossing,
+				shakes$scaled.projection[shakes$zero.crossing],
+				col = 1 + shakes$past.threshold
+			)
+		}
 		par(op)
 	})
 }
 
 #' @method plot paw.features
 #' @export
-plot.paw.features <- function(features) {
+plot.paw.features <- function(features, ...) {
 	if (exists("diagnostics", features)) {
-		plot_diagnostics(features)
+		plot_diagnostics(features, ...)
 	} else {
 		with(features$time.series, {
 			decorate <- function() {
