@@ -45,6 +45,16 @@ get_window <- function(u,
 	return(list(start=start, end=end))
 }
 
+# Find period of activity based on first and last crossings of a given
+# threshold.
+get_window_using_baseline <- function(u, threshold) {
+	above_threshold <- which(u > threshold)
+	return(list(
+		start = head(above_threshold),
+		end   = tail(above_threshold)
+	))
+}
+
 # Project a 2-dimensional time series onto its principal
 # axis of variation.
 compute_univariate_projection <- function(ux, uy, window) {

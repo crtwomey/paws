@@ -63,32 +63,45 @@ extract_features <- function(x, y=NULL,
 	# 1. x : vector, y : vector, length(x) == length(y)
 	# 2. x : matrix, with ncol == 2
 	if (is.vector(x)) {
-	       if (!is.vector(y) || length(x) != length(y)) {
+		if (!is.vector(y) || length(x) != length(y)) {
 			stop("x and y must be equal length vectors")
-	       }
+		}
 	} else if (is.matrix(x)) {
 		if (ncol(x) == 2) {
 			# standardize input
 			y <- x[,2]
 			x <- x[,1]
 		} else stop("x is a matrix but does not have exactly 2 columns")
-	}  else stop("invalid time series x y data")
+	} else stop("invalid time series x y data")
+
+	# use a fixed baseline if a baseline and threshold is specified
+	fixed_baseline <- ("fixed.baseline" %in% names(parameters)) &&
+		all(names(parameters$fixed.baseline) %in% c("y", "threshold"))
 
 	# put parameters in units convenient for processing
 	parameters <- convert_to_frames(parameters)
 	with(parameters, {
 
-	# clip sequence based on activity
+	# x and y activity windows
 	x.window <- get_window(
 		x, window.filter.size, window.filter.order, window.threshold
 	)
 	y.window <- get_window(
 		y, window.filter.size, window.filter.order, window.threshold
 	)
-	window <- list(
-		start = min(x.window$start, y.window$start),
-		end   = max(x.window$end,   y.window$end)
-	)
+
+	window <- if (fixed_baseline) {
+		# clip sequence based on height baseline
+		get_window_using_baseline(
+			y - fixed.baseline$y, fixed.baseline$threshold
+		)
+	} else {
+		# clip sequence based on activity
+		list(
+			start = min(x.window$start, y.window$start),
+			end   = max(x.window$end,   y.window$end)
+		)
+	}
 
 	# check that we found a valid window on paw activity
 	if (is.na(window$start) || is.na(window$end)) {
@@ -98,12 +111,17 @@ extract_features <- function(x, y=NULL,
 	x.clipped <- with(window, x[start:end])
 	y.clipped <- with(window, y[start:end])
 
-	# standardize height baseline
-	taus      <- 1:length(y.clipped)
-	ntaus     <- length(taus)
-	baseline  <- y.clipped[1] * (ntaus-(taus-1))/(ntaus-1) +
-	             y.clipped[ntaus] * (taus-1)/(ntaus-1)
-	y.clipped <- (y.clipped - baseline)
+	if (fixed_baseline) {
+		# use provided baseline
+		y.clipped <- (y.clipped - fixed.baseline$y)
+	} else {
+		# standardize height baseline
+		taus      <- 1:length(y.clipped)
+		ntaus     <- length(taus)
+		baseline  <- y.clipped[1] * (ntaus-(taus-1))/(ntaus-1) +
+		             y.clipped[ntaus] * (taus-1)/(ntaus-1)
+		y.clipped <- (y.clipped - baseline)
+	}
 
 	# compute univariate projection that preserves as
 	# much variability in paw movement as possible.
@@ -375,7 +393,7 @@ plot.paw.features <- function(features, ...) {
 			decorate()
 			plot(u, type = "l", las = 1, xaxs = "i",
 				xlab = "time (frames)",
-			ylab = "univariate projection"
+				ylab = "univariate projection"
 			)
 			decorate()
 			par(op)
