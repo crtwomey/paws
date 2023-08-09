@@ -20,6 +20,7 @@
 #
 
 # Find period of activity in given time series.
+#' @importFrom utils head tail
 get_window <- function(u,
 	filter.size,
 	filter.order,
@@ -47,6 +48,7 @@ get_window <- function(u,
 
 # Find period of activity based on first and last crossings of a given
 # threshold.
+#' @importFrom utils head tail
 get_window_using_baseline <- function(u, threshold) {
 	above_threshold <- which(u > threshold)
 	return(list(
@@ -57,6 +59,7 @@ get_window_using_baseline <- function(u, threshold) {
 
 # Project a 2-dimensional time series onto its principal
 # axis of variation.
+#' @importFrom stats prcomp
 compute_univariate_projection <- function(ux, uy, window) {
 	# unit vector in the same direction as vector u
 	unit <- function(u) {
@@ -103,6 +106,7 @@ compute_univariate_projection <- function(ux, uy, window) {
 
 # Identify a global peak in the time series (point in time
 # at which the overal maximum is achieved).
+#' @importFrom utils head
 find_global_peak <- function(u,
 	filter.size,
 	filter.order)
@@ -127,6 +131,7 @@ find_global_peak <- function(u,
 }
 
 # Find all local peaks in univariate time series of paw motion.
+#' @importFrom utils head
 find_local_peaks <- function(u,
 	filter.size,
 	filter.order,
@@ -163,6 +168,7 @@ get_time_post_peak <- function(u, peak) {
 }
 
 # Estimate the number of shakes based on univariate time series of paw motion.
+#' @importFrom utils head tail
 get_shakes_post_peak <- function(u,
 	global.peak.height,
 	first.peak.time,

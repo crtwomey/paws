@@ -25,8 +25,8 @@
 #'  for the cohort 1 data used in Jones et al.
 #' 
 #' @source Jones et al. (2020) A machine-vision approach for automated pain
-#'         measurement at millisecond timescales. bioRxiv.
-#'         \url{https://doi.org/10.1101/2020.02.18.955070}
+#'         measurement at millisecond timescales. eLife 9:e57258
+#'         \doi{10.7554/eLife.57258}
 #' @format A list of paw trajectories, each containing:
 #' \describe{
 #'   \item{\code{id}}{A unique id for each mouse}
@@ -53,6 +53,11 @@
 #' 
 #' @return pre-peak and post-peak paw features (plus diagnostics,
 #'         if enabled)
+#'
+#' @examples
+#' # example usage with a track from Jones et al. (2020)
+#' track    <- jones2020.tracks[[1]]
+#' features <- extract_features(track$time.series)
 #' 
 #' @export
 extract_features <- function(x, y=NULL,
@@ -373,7 +378,8 @@ plot_diagnostics <- function(features, clipped = FALSE,
 
 #' @method plot paw.features
 #' @export
-plot.paw.features <- function(features, ...) {
+plot.paw.features <- function(x, y = NULL, ...) {
+	features <- x
 	if (exists("diagnostics", features)) {
 		plot_diagnostics(features, ...)
 	} else {

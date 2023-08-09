@@ -15,8 +15,8 @@ A list of paw trajectories, each containing:
 }
 \source{
 Jones et al. (2020) A machine-vision approach for automated pain
-        measurement at millisecond timescales. bioRxiv.
-        \url{https://doi.org/10.1101/2020.02.18.955070}
+        measurement at millisecond timescales. eLife 9:e57258
+        \doi{10.7554/eLife.57258}
 }
 \usage{
 jones2020.tracks

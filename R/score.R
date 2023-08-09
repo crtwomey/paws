@@ -52,12 +52,12 @@ validate_model_arguments <- function(env=parent.frame()) {
 	# extract the correct data.frame if given a paw.features object
 	# or a list of paw.features objects.  otherwise check that we
 	# have at least been given a data.frame.
-	if (class(paw.features) == "paw.features") {
+	if (inherits(paw.features, "paw.features")) {
 		paw.features <- paw.features[[feature.set]]
-	} else if (class(paw.features) == "list") {
+	} else if (inherits(paw.features, "list")) {
 		oftype.paw.features <- sapply(paw.features, function(r) {
-			class(r) == "paw.features"
-	    	})
+			inherits(r, "paw.features")
+		})
 		if (all(oftype.paw.features)) {
 			# extract the correct feature set
 			features <- lapply(paw.features, function(f) {
@@ -65,7 +65,7 @@ validate_model_arguments <- function(env=parent.frame()) {
 			})
 			paw.features <- do.call("rbind", features)
 		} else stop("not all entries in list are paw.features")
-	} else if (class(paw.features) != "data.frame") {
+	} else if (!inherits(paw.features, "data.frame")) {
 		stop("invalid paw.features data")
 	}
 
@@ -144,6 +144,7 @@ validate_model_arguments <- function(env=parent.frame()) {
 #' 
 #' @return one or more pain scores as a vector
 #' 
+#' @importFrom stats coef
 #' @export
 pain_score <- function(paw.features,
 	strains          = NULL,
@@ -152,6 +153,7 @@ pain_score <- function(paw.features,
 	pain.model       = NULL)
 {
 	# validate arguments
+	standardized.features <- NULL
 	validate_model_arguments()
 
 	# validate pain.model if one is provided
@@ -222,6 +224,7 @@ pain_score <- function(paw.features,
 #' 
 #' @return pain model
 #' 
+#' @importFrom stats glm binomial
 #' @export
 create_pain_model <- function(paw.features,
 	strains          = NULL,
@@ -263,8 +266,8 @@ create_pain_model <- function(paw.features,
 	# ensure pain.stimulus is an ordinal factor
 	pain.levels   <- switch(pain.type, binary=binary, trinary=trinary)
 	pain.stimulus <- factor(pain.stimulus,
-		levels = pain.levels,
-		order  = TRUE
+		levels  = pain.levels,
+		ordered = TRUE
 	)
 
 	# combine standardized features with pain.stimulus information
@@ -275,7 +278,7 @@ create_pain_model <- function(paw.features,
 	if (pain.type == "binary") {
 		# run logistic regression
 		model <- glm(stimulus ~ .,
-			family = binomial(logit),
+			family = binomial("logit"),
 			data   = standardized.features,
 			method = "brglmFit"
 		)

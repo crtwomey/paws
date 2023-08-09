@@ -35,3 +35,9 @@ pre-peak and post-peak paw features (plus diagnostics,
 \description{
 Extract features for paw time series
 }
+\examples{
+# example usage with a track from Jones et al. (2020)
+track    <- jones2020.tracks[[1]]
+features <- extract_features(track$time.series)
+
+}
