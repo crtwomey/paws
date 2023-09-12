@@ -52,8 +52,8 @@ get_window <- function(u,
 get_window_using_baseline <- function(u, threshold) {
 	above_threshold <- which(u > threshold)
 	return(list(
-		start = head(above_threshold),
-		end   = tail(above_threshold)
+		start = head(above_threshold, 1),
+		end   = tail(above_threshold, 1)
 	))
 }
 
