@@ -8,6 +8,6 @@
 #' @import brglm2
 #' 
 #' @docType package
-#' @name paws
+#' @name pawsscore
 NULL
 

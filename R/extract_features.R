@@ -246,6 +246,7 @@ extract_features <- function(x, y=NULL,
 	}) # with parameters
 }
 
+#' @importFrom graphics par
 plot_diagnostics <- function(features, clipped = FALSE,
 	panel = c("all",
 		"x displacement", "y displacement", "vx velocity", "vy velocity",
@@ -260,6 +261,10 @@ plot_diagnostics <- function(features, clipped = FALSE,
 		))
 	}
 	panel <- match.arg(panel)
+
+	# restore original plotting parameters after exiting
+	op <- par(no.readonly = TRUE)
+	on.exit(par(op))
 
 	with(features$diagnostics, {
 		s <- window$start
@@ -287,7 +292,7 @@ plot_diagnostics <- function(features, clipped = FALSE,
 			projections  = c(1, 2),
 			c(1, 1)
 		)
-		op <- par(mar = c(5, 5, 4, 1), mfrow = mfrows)
+		par(mar = c(5, 5, 4, 1), mfrow = mfrows)
 
 		if (panel %in% c("all", "kinematics", "displacement", "x displacement")) {
 			plot(x, type = "l", las = 1, xaxs = "i", xlim = w,
@@ -372,11 +377,11 @@ plot_diagnostics <- function(features, clipped = FALSE,
 				col = 1 + shakes$past.threshold
 			)
 		}
-		par(op)
 	})
 }
 
 #' @method plot paw.features
+#' @importFrom graphics par
 #' @export
 plot.paw.features <- function(x, y = NULL, ...) {
 	features <- x
@@ -384,11 +389,15 @@ plot.paw.features <- function(x, y = NULL, ...) {
 		plot_diagnostics(features, ...)
 	} else {
 		with(features$time.series, {
+			# restore original plotting parameters after exiting
+			op <- par(no.readonly = TRUE)
+			on.exit(par(op))
+
 			decorate <- function() {
 				abline(h = 0, col = "gray60")
 				abline(v = tstar, lty = 1, col = 2, lwd = 2)
 			}
-			op <- par(mar = c(5, 5, 1, 1), mfrow = c(3, 1))
+			par(mar = c(5, 5, 1, 1), mfrow = c(3, 1))
 			plot(x, type = "l", las = 1, xaxs = "i",
 				xlab = "time (frames)"
 			)
@@ -402,7 +411,6 @@ plot.paw.features <- function(x, y = NULL, ...) {
 				ylab = "univariate projection"
 			)
 			decorate()
-			par(op)
 		})
 	}
 }

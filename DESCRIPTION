@@ -1,7 +1,7 @@
-Package: paws
+Package: pawscore
 Date: 2023-08-08
 Version: 1.0.2
-Title: Pain Assessment at Withdrawal Speeds
+Title: Pain Assessment at Withdrawal Speeds (PAWS)
 Authors@R: c(
     person("Colin", "Twomey", email="crtwomey@gmail.com", role=c("aut","cre")),
     person("Jessica", "Jones", role="aut"),
@@ -9,8 +9,8 @@ Authors@R: c(
     person("Joshua", "Plotkin", role="aut"),
     person("Ishmail", "Abdus-Saboor", role="aut"))
 Description: Automated pain scoring from paw withdrawal tracking data. Based on
-             Jones et al. (2020) A machine-vision approach for automated pain
-             measurement at millisecond timescales.
+             Jones et al. (2020) "A machine-vision approach for automated pain
+             measurement at millisecond timescales" <doi:10.7554/eLife.57258>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

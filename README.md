@@ -2,12 +2,18 @@
 ## paws: Pain Assessment at Withdrawal Speeds
 
 Automated pain scoring from paw withdrawl tracking data based on
-[Jones et al. (2020)](https://doi.org/10.1101/2020.02.18.955070)
+[Jones et al. (2020)](https://doi.org/10.7554/eLife.57258)
 A machine-vision approach for automated pain measurement at millisecond
 timescales. This R package takes paw trajectory data in response to a
 stimulus and provides an automated scoring of pain.
 
-### Installing
+### Installing from CRAN
+
+```R
+install.packages("pawscore")
+```
+
+### Installing from source
 
 Using the devtools package (the first line can be skipped if devtools is
 already installed), in R run:
@@ -24,12 +30,21 @@ repository and run[^1]
 
 ```console
 $ R CMD build paws
-$ R CMD install paws_1.0.0.tar.gz
+$ R CMD install pawscore_1.0.2.tar.gz
 ```
 
 [^1]: The `$` symbol just refers to your commandline's prompt. It may
   look different on different systems. When typing these commands into
   your commandline, don't include the `$` symbol.
+
+
+### Loading
+
+Once installed, the package can be loaded into R using:
+
+```R
+library(pawscore)
+```
 
 ### Usage
 
@@ -243,9 +258,14 @@ choices; less so vice versa).
 
 ### Credit
 
-Please cite [Jones et al. (2020)](https://doi.org/10.1101/2020.02.18.955070)
+Please cite [Jones et al. (2020)](https://doi.org/10.7554/eLife.57258)
 and include a link to this repository if you use this code in an academic
 publication.
+
+> Jessica M Jones, William Foster, Colin R Twomey, Justin Burdge, Osama M Ahmed,
+> Talmo D Pereira, Jessica A Wojick, Gregory Corder, Joshua B Plotkin, Ishmail
+> Abdus-Saboor (2020) A machine-vision approach for automated pain measurement at
+> millisecond timescales. eLife 9:e57258
 
 Testing, bug reports, and code contributions very welcome.
 
